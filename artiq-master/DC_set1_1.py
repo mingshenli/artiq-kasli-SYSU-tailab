@@ -52,7 +52,7 @@ class mainprogram(MainWindow):
         self.readall.clicked.connect(self.readallselect)
     def generateDC(self,num,move):
         def func():
-            s=getattr(self,'checkBox_DC'+str(num)).checkState()
+            s=getattr(self,'checkBox_DC_'+str(num)).checkState()
             if s==2:
                 self.DCUP(num,move)
                 getattr(self,'DCstate_'+str(num)).setText(str(DCvalue[num-1]))
@@ -84,7 +84,7 @@ class mainprogram(MainWindow):
   
     def selectDC(self,move):    
         for i in range(16):
-            DCcheck[i]=getattr(self,'checkBox_DC'+str(i+1)).checkState()
+            DCcheck[i]=getattr(self,'checkBox_DC_'+str(i+1)).checkState()
         if move ==1:
           for num in range(16):
             if (DCcheck[num]==2):
@@ -105,7 +105,7 @@ class mainprogram(MainWindow):
 
     def readallselect(self):  
         for i in range(16):
-           DCcheck[i]=getattr(self,'checkBox_DC'+str(i+1)).checkState()
+           DCcheck[i]=getattr(self,'checkBox_DC_'+str(i+1)).checkState()
         DCvalue_temp=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         for i in range(16):
            DCvalue_temp[i]=float(getattr(self,'DCstate_'+str(i+1)).text())

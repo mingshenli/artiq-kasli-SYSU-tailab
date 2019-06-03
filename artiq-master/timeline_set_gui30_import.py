@@ -6,7 +6,7 @@ Created on Fri Jan 25 21:57:20 2019
 """
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from gui_window.DC_set_window20 import Ui_MainWindow
+from gui_window.timeline_set_gui30_window import Ui_MainWindow
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)

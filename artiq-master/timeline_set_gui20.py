@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Sun Sep  2 15:58:16 2018
 
@@ -13,7 +13,7 @@ Created on Fri May 18 20:46:45 2018
 """
 import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
-from timeline_set_gui20_import  import MainWindow 
+from timeline_set_gui30_import  import MainWindow 
 from PyQt5.QtWidgets import QFileDialog,QMessageBox
 import time as t
 import os
