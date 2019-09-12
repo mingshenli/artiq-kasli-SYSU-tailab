@@ -51,12 +51,13 @@ def update():
 #    if len(ax)!=len(ay):
 #        print('***************************error*******************************************')
 #        print(m.sin(len(ax)))
-    ax=np.array(datasets.get('count_x'))
+#    ax=np.array(datasets.get('count_x'))
     ay=np.array(datasets.get('count_y'))
-    while len(ax)!=len(ay):
-        ax=np.array(datasets.get('count_x'))
-        ay=np.array(datasets.get('count_y'))
-    curve.setData(ax,ay)
+#    while len(ax)!=len(ay):
+#        ax=np.array(datasets.get('count_x'))
+#        ay=np.array(datasets.get('count_y'))
+#    curve.setData(ax,ay)
+    curve.setData(ay)
    
 #    if ptr == 0:
 #        p6.enableAutoRange('xy', True)  ## stop auto-scaling after the first data set is plotted

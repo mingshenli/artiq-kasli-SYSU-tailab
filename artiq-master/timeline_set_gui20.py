@@ -13,18 +13,128 @@ Created on Fri May 18 20:46:45 2018
 """
 import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
-from timeline_set_gui30_import  import MainWindow 
+from timeline_set_gui30_import  import MainWindow,timeline_vi_window
 from PyQt5.QtWidgets import QFileDialog,QMessageBox
+from PyQt5.QtCore import pyqtSignal
 import time as t
 import os
 import sys,copy,re
+import numpy as np
 from artiq.protocols.pc_rpc import (Client)
+import pyqtgraph as pg
 #from led import LED
 
 schedule, exps, datasets = [
     Client('::1', 3251, 'master_' + i) for i in 'schedule experiment_db dataset_db'.split()
     ]
 
+
+class timeline_vi(timeline_vi_window):
+    def __init__(self):
+        super().__init__()
+#        self.verticalLayout
+#        self.do()
+        self.timeline=[]
+        self.max_max_chan=0
+        self.plot_section=QtGui.QVBoxLayout()
+        
+        self.centralwidget.setLayout(self.plot_section)
+        
+        self.pw1=pg.PlotWidget(name='Plot1')
+        self.pw1.showGrid(x=True,y=True)
+        self.plot_section.addWidget(self.pw1)
+      
+#        pw2=pg.PlotWidget(name='Plot1')
+#        self.verticalLayout.addWidget(pw2)
+#        self.pushButton.clicked.connect(self.clean)
+        print(type(self.pw1))
+#        self.update(1)
+#    def update(self,timeline):
+#        self.timeline=timeline
+#        self.plot()
+#    def do(self):
+#        print('do')
+#        a=mainprogram()
+#        a.mySignal.connect(self.plot)
+#        a.pushButton_add.clicked.connect(self.plot)
+   
+        
+    def plot(self,timeline):
+        
+        max_chan=0
+        max_t=0
+        temp=sorted(timeline,key=lambda timeline:timeline[3]*self.unitchange(timeline[4]))
+        max_t=temp[len(temp)-1][3]*self.unitchange(temp[len(temp)-1][4]) 
+        print(max_t)
+        temp=sorted(timeline,key=lambda timeline:timeline[0])
+        max_chan=temp[len(temp)-1][0]
+        
+        print('call')
+        print('chan',max_chan)
+        x=np.linspace(0,max_t+1,max_t+1)
+        y=np.linspace(0,0,max_t+1)
+        ######################################################设置方波数组
+        for i in range(1,max_chan+1):
+            setattr(self,'y'+str(i),np.linspace(i,i,max_t+1))
+       
+        for i in range(len(timeline)):
+            index_chan=int(timeline[i][0])
+            index_start=int(timeline[i][1]*self.unitchange(timeline[i][2]))
+            index_stop=int(timeline[i][3]*self.unitchange(timeline[i][4]))
+            getattr(self,'y'+str(index_chan))[index_start:index_stop]=index_chan+0.9
+#       ######################################################设置方波数组    
+        for i in range(1,max(self.max_max_chan,max_chan)+1):
+            try:
+                 getattr(self,'p'+str(i)).clear()
+            except:
+                pass
+        for i in range(1,max_chan+1):
+            try:
+                 getattr(self,'p'+str(i)).setData(x,getattr(self,'y'+str(i)),stepMode=False, fillLevel=i, brush='b')
+                 getattr(self,'p'+str(i)).showGrid(x=True, y=True)
+            except:
+                setattr(self,'p'+str(i),self.pw1.plot())
+                getattr(self,'p'+str(i)).setData(x,getattr(self,'y'+str(i)),stepMode=False, fillLevel=i, brush='b')
+                
+            
+        self.max_max_chan=max_chan 
+#            self.p1.plot(x,getattr(self,'y'+str(i)),fillLeval=i)
+#        self.p1=self.pw1.plot()
+#        self.p1.setData(x,y)
+#    def update(self,timeline):
+#        
+#        pw2=pg.PlotWidget(name='Plot1')
+#        self.verticalLayout.addWidget(pw2)
+#        
+#        max_chan=0
+#        max_t=0
+#        temp=sorted(timeline,key=lambda timeline:timeline[3]*self.unitchange(timeline[4]))
+#        max_t=temp[len(temp)-1][3]*self.unitchange(temp[len(temp)-1][4]) 
+#        print(max_t)
+#        temp=sorted(timeline,key=lambda timeline:timeline[0])
+#        max_chan=temp[len(temp)-1][0]
+#        print(max_chan)
+#        for i in range(3):
+#            setattr(self,'chan'+str(i),pg.PlotWidget(name='channel'+str(i)))
+#            self.verticalLayout.addWidget(getattr(self,'chan'+str(i)))
+#            print(type(self.chan0))
+#        self.verticalLayout.addWidget(self.chan0)
+    def unitchange(self,str):
+        if str=='s':
+            return 1000000000
+        if str=='ms':
+            return 1000000
+        if str=='us':
+            return 1000
+        if str=='ns':
+            return 1   
+        
+        
+        
+        
+        
+        
+        
 class mainprogram(MainWindow):
     global DCvalue 
     global DCcheck
@@ -37,10 +147,13 @@ class mainprogram(MainWindow):
     DClength=[0,0,0,0,0,0,0,0,0,0]
     set_timeline=[1,0.0,'s',0.0,'s']
     timeline=[[1,0.0,'s',0.0,'s']]
-    
+    mySignal=pyqtSignal(str)
     def __init__(self):
         super().__init__()
         
+        
+        self.plot=timeline_vi()
+        self.plot.show()
         
         
         self.pinbox_begintime.valueChanged.connect(self.starttime)
@@ -113,7 +226,11 @@ class mainprogram(MainWindow):
 #            set_timeline[3]=a*1000000
 #        if label=='s':
 #            set_timeline[3]=a*1000000000
+    def plot_timeline(self):
+        
+        self.plot.plot(timeline)
     def addtimeline(self):
+        self.plot_timeline()
         add=copy.copy(set_timeline)
         timeline.append(add)
         self.textEdit_log.append("current timeline:\n  (%s)"%timeline)
@@ -138,14 +255,17 @@ class mainprogram(MainWindow):
             return 1000
         if str=='ns':
             return 1
-    def showtimeline(self):
+    def showtimeline(self):##################################################################################################
         self.textEdit_timeline.clear()
 #        self.textEdit_timeline.append('ttl|starttime  |stoptime')
         
         for i in range(len(timeline)):
             self.textEdit_timeline.append(str(timeline[i]))
         self.textEdit_timeline.append('')#######################为了和txt读入格式统一
-            
+        self.plot_timeline()
+#        a=timeline_vi()
+#        a.update(timeline)
+        self.mySignal.emit('a')
     def savetimeline(self):
         
         fileName,ok = QFileDialog.getSaveFileName(self,
@@ -352,4 +472,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     a = mainprogram()
     a.show()
+#    b=timeline_vi()
+#    b.show()
+   
     sys.exit(app.exec_()) 

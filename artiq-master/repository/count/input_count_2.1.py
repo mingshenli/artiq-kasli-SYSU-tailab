@@ -6,9 +6,13 @@ Created on Sat Dec  1 16:50:51 2018
 """
 
 from artiq.experiment import *
-
+from artiq.protocols.pc_rpc import (Client)
+schedule, exps, datasets = [
+    Client('::1', 3251, 'master_' + i) for i in 'schedule experiment_db dataset_db'.split()
+    ]
 class inputtest(EnvExperiment):
     """input_count_test2.1___singal_count"""
+    #真正读数的
     def build(self):
         self.setattr_device("core")
         self.setattr_device("core_dma")
@@ -19,8 +23,20 @@ class inputtest(EnvExperiment):
 #            NumberValue(default=0.2, unit='ms', ndecimals=3, step=0.1)) 
         print("set the argument carefuly by open the py document,not through the gui")
 #        self.aa=A(self)
-        self.countt=[]
+        try:
+            self.countt=datasets.get('count_y')
+        except:
+            pass
+                
         self.t=[]
+        ##################################################################选择是否清除循环周期
+#        try:
+#            self.set_dataset("count_y",[],broadcast=True, save=False)
+#            self.set_dataset("count_x",[],broadcast=True, save=False)
+#        except:
+#            pass
+        ##################################################################选择是否清除循环周期
+            
 #        print(help([self.ttl1.count]))
 #        print(dir([self.ttl16]))
 #    @kernel  
@@ -49,21 +65,23 @@ class inputtest(EnvExperiment):
         countt=-1
         with parallel:
 #            self.core_dma.playback_handle(pulses_handle)
-            for q in range(2):
-                self.ttl16.pulse(2*ms)
-                delay(2*ms)
-#            self.ttl16.pulse(10*ns) 
+#            for q in range(2):##################################平行在16口输出脉冲
+#                self.ttl16.pulse(2*ms)
+#                delay(2*ms)
+##            self.ttl16.pulse(10*ns) 
             
-            while(i<2):
+            while(i<100):#控制循环周期，很大时相当于一直开
                 try:
-#                    delay(1000*ms)
+                    
 #                    self.core.reset()
                     self.core.break_realtime()
-                    self.ttl1.gate_rising(30*ms)
+                    delay(500*ms)#################################################################延时
+                    self.ttl1.gate_rising(30*ms)#################################################读脉冲窗口时间
                     countt=((self.ttl1.count()))
-#                    print("****************************",countt,"*********************************")
+                    print("****************************",countt,"*********************************")
                     i=i+1
                     self.setdata(countt,i)
+                    
                     
                 except RTIOUnderflow:
 #                    a=self.ttl1.count()
@@ -75,13 +93,14 @@ class inputtest(EnvExperiment):
                     self.setdata(-1,i)
                     
 #                    print("**********************flow********************************")
-        print(f,'/',i)
+        print('fail/total=',f,'/',i)
         print("*************************end*************************")
    
     def setdata(self,count,t):
 #        print('________________________')
         self.countt.append(count)
         self.t.append(t)
+        
         self.set_dataset("count_y",self.countt,broadcast=True, save=False)
         self.set_dataset("count_x",self.t,broadcast=True, save=False)
 

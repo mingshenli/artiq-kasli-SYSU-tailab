@@ -19,9 +19,12 @@ import math as m
 #        delay(10*ns)
 #        self.ttl16.off()
 #        delay(10*ns)
-        
+from artiq.protocols.pc_rpc import (Client)
+schedule, exps, datasets = [
+    Client('::1', 3251, 'master_' + i) for i in 'schedule experiment_db dataset_db'.split()
+    ]       
 class inputtest(EnvExperiment):
-    """input_count_test2.0___singal_count"""
+    """sig_simulate"""
     def build(self):
         self.setattr_device("core")
         self.setattr_device("core_dma")
@@ -31,6 +34,12 @@ class inputtest(EnvExperiment):
         self.setattr_argument("tion", # PMT 采集时间 
             NumberValue(default=0.2, unit='ms', ndecimals=3, step=0.1)) 
         print("set the argument carefuly by open the py document,not through the gui")
+        self.pulse=[]
+        self.pulse=datasets.get('count_y')
+        try:
+            self.pulse=datasets.get('count_y')
+        except:
+            pass
 #        self.aa=A(self)
 #    @kernel  
 #    def record(self):
@@ -76,18 +85,18 @@ class inputtest(EnvExperiment):
     def run(self):
                     i=1
                     roundd=0
-                    pulse=[]
-                    x=[]
-                    while i!=0 and roundd<1000:
-                        pulse.append(m.sin(roundd))
-                        x.append(roundd)
-                        if len(x)!=len(pulse):
-                            print("*******************************************error*********************************************")
-                            print(sin(roundd))
+                   
+                   
+                    while i!=0 and roundd<100:
+                        self.pulse.append(m.sin(roundd))
+#                        self.x.append(roundd)
+#                        if len(x)!=len(pulse):
+#                            print("*******************************************error*********************************************")
+#                            print(sin(roundd))
                         roundd+=1
                        
-                        self.set_dataset("count_x",x,broadcast=True, save=False)
-                        self.set_dataset("count_y",pulse,broadcast=True, save=False)
+#                        self.set_dataset("count_x",self.x,broadcast=True, save=False)
+                        self.set_dataset("count_y",self.pulse,broadcast=True, save=False)
                         t.sleep(0.005)
                     
                         
