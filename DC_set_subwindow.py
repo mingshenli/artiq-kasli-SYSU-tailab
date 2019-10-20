@@ -7,7 +7,7 @@ Created on Fri Jan 25 21:35:22 2019
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from DC_set_import import MainWindow
+from DC_set_subwindow_import import MainWindow
 import sys,copy
 import serial as s 
 from PyQt5.QtCore import pyqtSignal, QObject
@@ -18,7 +18,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 #    Client('::1', 3251, 'master_' + i) for i in 'schedule experiment_db dataset_db'.split()
 #    ]
 
-class DC_mainprogram(MainWindow):
+class dc_16chan_mainwindow(MainWindow):
     global DCvalue 
     global DCcheck
     global set_timeline #ttl/起始时间/终止时间
@@ -46,6 +46,8 @@ class DC_mainprogram(MainWindow):
             getattr(self,'doubleSpinBox_'+str(i)).valueChanged.connect(getattr(self,'DC'+str(i)+'length'))
         for i in range(1,17):
             getattr(self,'DCstate_'+str(i)).setText(str(DCvalue[i-1]))
+        
+            
     
         self.DCup_sel.clicked.connect(self.dcup_sel)
         self.DCdown_sel.clicked.connect(self.dcdown_sel)
@@ -56,7 +58,7 @@ class DC_mainprogram(MainWindow):
             if s==2:
                 self.DCUP(num,move)
                 getattr(self,'DCstate_'+str(num)).setText(str(DCvalue[num-1]))
-                self.sig.emit(DCvalue)
+#                self.sig.emit(DCvalue)
         return func
     
     def generateLen(self,num):
@@ -116,7 +118,13 @@ class DC_mainprogram(MainWindow):
                  self.sendorder(num+1,DCvalue[num])
         self.textEdit_log.append('succeed in reading current DC value at'+str(DCvalue))
     
-    
+    def get_pa_state(self,chan):
+        for i in range(16):
+            DCcheck[i]=getattr(self,'checkBox_DC_'+str(i+1)).checkState()
+        port=chan[2:]
+        port=int(port)
+        state=DCcheck[port-1]
+        return state
       
     def sendorder(self,port,v):
         print('port:',port,'V',v)
@@ -148,6 +156,6 @@ class DC_mainprogram(MainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    a = DC_mainprogram()
+    a = DC_16chan_mainwindow()
     a.show()
     sys.exit(app.exec_()) 

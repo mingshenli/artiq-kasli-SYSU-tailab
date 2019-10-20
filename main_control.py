@@ -11,6 +11,8 @@ import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import sys,copy,re
+from DC_set_subwindow import dc_16chan_mainwindow
+from PyQt5.QtCore import Qt, QThread,pyqtSignal, QTimer
 
 from artiq.protocols.pc_rpc import (Client)
 from hardwarelib import hardwarelist, dc_16chan,SG382
@@ -33,6 +35,13 @@ class mainprogram(Main_control_window):
         self.hardware_name.currentTextChanged.connect(self.get_parameter)
         self.add.clicked.connect(self.add_hardware_scan)
         self.update_manu.clicked.connect(self.update_manualy)
+        
+        self.initsubwindow()
+        self.timeer=QTimer()
+        self.timeer.timeout.connect(self.timerun)
+        
+    def initsubwindow(self):#子窗口的实例化在这里，硬件列表的初始化在scan里面
+        self.DC_16chan_mainwindow=dc_16chan_mainwindow()
     def initHardware(self):
         _translate = QtCore.QCoreApplication.translate#更新硬件列表用的，在自动生成的gui py里面copy的语法
         
@@ -87,8 +96,18 @@ class mainprogram(Main_control_window):
             os.popen('activate artiq-kasli && d: && cd D:/artiq-kasli/artiq-master && python timeline_set_gui20.py')
         except Exception as e:
             print(e)
-    def activate_DCset(self):
-        os.popen('cd D:/artiq-kasli/artiq-master && python DC_set1_1.py')
+            
+    def activate_DCset(self):#######################################################################
+#        os.popen('cd D:/artiq-kasli/artiq-master && python DC_set1_1.py')
+        
+#        self.DC_window.sig.connect(self.data_from_DC)
+        self.DC_16chan_mainwindow.show()
+#        self.t=test()
+#        self.t.start()
+#        self.t.wait()
+    def data_from_DC(self,list):
+        self.log.append('DC:'+str(list))
+        
     def activate_pulse_monitor(self):
         os.popen('cd D:/artiq-kasli/artiq-master && python pulse_monitor_window.py')
     def startcount(self):
@@ -136,28 +155,83 @@ class mainprogram(Main_control_window):
             if reply==QMessageBox.No:
                 return
             for pa in range(pam_number):
-                    re=getattr(getattr(self.scan,pa_lib[pa][0]),pa_lib[pa][1])(pa_lib[pa][2]+(cycle)*pa_lib[pa][3])
-                    print('********************************',re)
-                    self.log.append(str(re))
-                    re=getattr(self.scan.DC_16chan,'test')(1)
-                    print('--------------------------------',re)
-                    print('---',getattr(self.scan.DC_16chan,'test')(1))
-                    self.log.append(str(re))
+                    check=getattr(getattr(self,pa_lib[pa][0]+'_mainwindow'),'get_pa_state')(pa_lib[pa][1])
+                    if check==2:
+                        print('state: ',check)
+                        re=getattr(getattr(self.scan,pa_lib[pa][0]),pa_lib[pa][1])(pa_lib[pa][2]+(cycle)*pa_lib[pa][3])
+                        print('    ',re)
+                        self.log.append('    '+str(re))
+    #                    re=getattr(self.scan.DC_16chan,'te')(1)
+    #                    print('--------------------------------',re)
+    #                    print('---',getattr(self.scan.DC_16chan,'te')(1))
+    #                    self.log.append(str(re))
+                    if check==0:
+                        self.log.append('    current: '+str(pa_lib[pa][0])+'-'+str(pa_lib[pa][1])+' is not activate')
         
             
     def run_without_artiq_settime(self):
         self.log.append('***running:no artiq hardware scan set time go***')
-        roundtime=self.Roundtime.value()
-        pa_lib=self.hardware_scan_timeline
-        t_length=self.time_length.value()
-        pam_number=len(pa_lib)
-        for cycle in range(roundtime):
-            t.sleep(t_length)
-            for pa in range(pam_number):
-                    getattr(getattr(self.scan,pa_lib[pa][0]),pa_lib[pa][1])(pa_lib[pa][2]+(cycle)*pa_lib[pa][3])
-                   
-                   
+#        roundtime=self.Roundtime.value()
+#        pa_lib=self.hardware_scan_timeline
+#        t_length=self.time_length.value()
+#        pam_number=len(pa_lib)
         
+        self.roundtime=self.Roundtime.value()#总循环次数
+        self.roundnow=0#当前循环次数
+        self.pa_lib=self.hardware_scan_timeline
+        self.t_length=self.time_length.value()
+        self.pam_number=len(self.pa_lib)
+        self.time_control()
+        return
+        
+#        for cycle in range(roundtime):
+#            t.sleep(1)
+#            for pa in range(pam_number):
+#                    check=getattr(getattr(self,pa_lib[pa][0]+'_mainwindow'),'get_pa_state')(pa_lib[pa][1])
+#                    if check==2:
+#                        print('state: ',check)
+#                        re=getattr(getattr(self.scan,pa_lib[pa][0]),pa_lib[pa][1])(pa_lib[pa][2]+(cycle)*pa_lib[pa][3])
+#                        print('    ',re)
+#                        self.log.append('    '+str(re))
+#    #                    re=getattr(self.scan.DC_16chan,'te')(1)
+#    #                    print('--------------------------------',re)
+#    #                    print('---',getattr(self.scan.DC_16chan,'te')(1))
+#    #                    self.log.append(str(re))
+#                    if check==0:
+#                        self.log.append('    current: '+str(pa_lib[pa][0])+'-'+str(pa_lib[pa][1])+' is not activate')
+#                        print('not output')
+    def time_control(self):
+        t_length=self.time_length.value()
+        
+        
+        self.timeer.setSingleShot(False)
+        self.timeer.start(int(t_length*1000))
+        
+    def timerun(self):
+        if self.roundnow<=self.roundtime:
+            for pa in range(self.pam_number):
+                    check=getattr(getattr(self,self.pa_lib[pa][0]+'_mainwindow'),'get_pa_state')(self.pa_lib[pa][1])
+                    if check==2:
+#                        print('state: ',check)
+                        re=getattr(getattr(self.scan,self.pa_lib[pa][0]),self.pa_lib[pa][1])(self.pa_lib[pa][2]+(self.roundnow)*self.pa_lib[pa][3])
+#                        print(' re',re)
+                        self.log.append('    '+str(re))
+    #                    re=getattr(self.scan.DC_16chan,'te')(1)
+    #                    print('--------------------------------',re)
+    #                    print('---',getattr(self.scan.DC_16chan,'te')(1))
+    #                    self.log.append(str(re))
+                    if check==0:
+                        self.log.append('    current: '+str(self.pa_lib[pa][0])+'-'+str(self.pa_lib[pa][1])+' is not activate')
+                        print('not output',self.roundnow)
+            self.roundnow=self.roundnow+1
+        else:
+            self.timeer.stop()
+     
+
+
+
+
+            
     def run_with_artiq(self):
         self.log.append('***running:artiq with hardware set***')
     def run_artiq_timeline(self):
@@ -216,6 +290,19 @@ class mainprogram(Main_control_window):
             
             r.append(rr)
         return r
+    
+class test(QThread):
+    def __init__(self):
+        super(test, self).__init__()
+
+        self.w=dc_16chan_mainwindow()
+    def run(self):
+        for a in range(10):
+            t.sleep(1)
+            print(a)
+        self.terminate()
+
+    
 class Scan(object):
     def __init__(self):
         self.hardware=hardwarelist()
