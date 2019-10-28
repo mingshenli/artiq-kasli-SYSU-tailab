@@ -44,7 +44,7 @@ class B(object):
         self.print2('def run(self):')
         self.print3("self.core.reset()")
         self.print3('with parallel:')
-        self.print4('self.ttl1.gate_rising(2*ms)')
+#        self.print4('self.ttl1.gate_rising(2*ms)')
         self.print4('with sequential:')
             
     def print1(self,str):
