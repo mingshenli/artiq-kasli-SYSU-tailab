@@ -58,19 +58,27 @@ class timeline_vi(timeline_vi_window):
 #        a.mySignal.connect(self.plot)
 #        a.pushButton_add.clicked.connect(self.plot)
    
-        
+    def clearall(self):
+        for i in range(1,16):
+            try:
+                 getattr(self,'p'+str(i)).clear()
+            except:
+                pass
+
     def plot(self,timeline):
-        
+        if len(timeline)==0:
+            self.clearall()
+            return
         max_chan=0
         max_t=0
         temp=sorted(timeline,key=lambda timeline:timeline[3]*self.unitchange(timeline[4]))
         max_t=temp[len(temp)-1][3]*self.unitchange(temp[len(temp)-1][4]) 
-        print(max_t)
+        #print(max_t)
         temp=sorted(timeline,key=lambda timeline:timeline[0])
         max_chan=temp[len(temp)-1][0]
         
-        print('call')
-        print('chan',max_chan)
+        #print('call')
+        #print('chan',max_chan)
         x=np.linspace(0,max_t+1,max_t+1)
         y=np.linspace(0,0,max_t+1)
         ######################################################设置方波数组

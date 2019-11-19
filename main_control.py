@@ -9,16 +9,16 @@ import os
 import time as t
 import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox,QFileDialog,QMessageBox
 import sys,copy,re
 from DC_set_subwindow import dc_16chan_mainwindow
 from PyQt5.QtCore import Qt, QThread,pyqtSignal, QTimer
 
 from artiq.protocols.pc_rpc import (Client)
 from hardwarelib import hardwarelist, dc_16chan,SG382
-#schedule, exps, datasets = [
-#    Client('::1', 3251, 'master_' + i) for i in 'schedule experiment_db dataset_db'.split()
-#    ]
+schedule, exps, datasets = [
+    Client('::1', 3251, 'master_' + i) for i in 'schedule experiment_db dataset_db'.split()
+    ]
 
 class mainprogram(Main_control_window):
     def __init__(self):
@@ -30,8 +30,9 @@ class mainprogram(Main_control_window):
         self.DCset.clicked.connect(self.activate_DCset)
         self.Run.clicked.connect(self.run_timeline)
         self.Monitor.clicked.connect(self.activate_pulse_monitor)
-        self.pushButton.clicked.connect(self.startcount)
-        self.pushButton_2.clicked.connect(self.clear)
+        self.pushButton.clicked.connect(self.startcount)#startcount
+        self.pushButton_2.clicked.connect(self.clear)#stopcount
+        self.save_count.clicked.connect(self.savecount)
         self.hardware_name.currentTextChanged.connect(self.get_parameter)
         self.add.clicked.connect(self.add_hardware_scan)
         self.update_manu.clicked.connect(self.update_manualy)
@@ -109,7 +110,7 @@ class mainprogram(Main_control_window):
         self.log.append('DC:'+str(list))
         
     def activate_pulse_monitor(self):
-        os.popen('cd D:/artiq-kasli/artiq-master && python pulse_monitor_window.py')
+        os.popen('activate artiq-kasli && d: && cd D:/artiq-kasli/artiq-master && python pulse_monitor_window.py')
     def startcount(self):
         expid1 = dict(
         file = 'D:/artiq-kasli/artiq-master/repository/count/input_count_2.1.py',
@@ -118,17 +119,19 @@ class mainprogram(Main_control_window):
         arguments=None
         )
         rid = schedule.submit(
-                pipeline_name='main', expid=expid1, priority=0, due_date=None, flush=False)
+                pipeline_name='count', expid=expid1, priority=0, due_date=None, flush=False)
         
     def clear(self):
-        expid1 = dict(
-        file = 'D:/artiq-kasli/artiq-master/repository/count/clearfigure.py',
-        class_name = 'clearfigure',
-        log_level=logging.DEBUG,
-        arguments=None
-        )
-        rid = schedule.submit(
-                pipeline_name='main', expid=expid1, priority=0, due_date=None, flush=False)
+        datasets.set('count_y',[])
+        #######################################没用了下面的
+#        expid1 = dict(
+#        file = 'D:/artiq-kasli/artiq-master/repository/count/clearfigure.py',
+#        class_name = 'clearfigure',
+#        log_level=logging.DEBUG,
+#        arguments=None
+#        )
+#        rid = schedule.submit(
+#                pipeline_name='main', expid=expid1, priority=0, due_date=None, flush=False)
         
         
         
@@ -144,8 +147,8 @@ class mainprogram(Main_control_window):
             
     def run_without_artiq_manual(self):
         self.log.append('***running:no artiq hardware scan manual go***')
-        roundtime=self.Roundtime.value()
-        pa_lib=self.hardware_scan_timeline
+        roundtime=self.Roundtime.value()#获取循环次数
+        pa_lib=self.hardware_scan_timeline#获取硬件扫描时序
         
         pam_number=len(pa_lib)
         for cycle in range(roundtime):
@@ -234,6 +237,8 @@ class mainprogram(Main_control_window):
             
     def run_with_artiq(self):
         self.log.append('***running:artiq with hardware set***')
+        self.log.append('***hardware are not ready yet***')
+        self.run_artiq_timeline()
     def run_artiq_timeline(self):
 #        roundtime=self.Roundtime.value()
         expid1 = dict(
@@ -290,6 +295,28 @@ class mainprogram(Main_control_window):
             
             r.append(rr)
         return r
+    def savecount(self):
+        
+        try:
+            y=datasets.get("count_y")
+            t=datasets.get("count_t")
+        except :
+            self.log.append('没有数据可读取')
+            return
+        try:
+            fileName,ok = QFileDialog.getSaveFileName(self,
+                                        "文件保存",
+                                        "D:/artiq-kasli/artiq-master/countlib",
+                                        "Text Files (*.txt)")
+            
+            f=open(fileName,"w",encoding="UTF-8-sig")
+            
+            for i in range(len(y)):
+                f.write(str(t*(i))+' '+str(y[i])+'\n')
+            f.close()
+        except:
+            return
+        
     
 class test(QThread):
     def __init__(self):

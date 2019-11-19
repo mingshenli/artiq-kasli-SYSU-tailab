@@ -35,7 +35,7 @@ class inputtest(EnvExperiment):
             NumberValue(default=0.2, unit='ms', ndecimals=3, step=0.1)) 
         print("set the argument carefuly by open the py document,not through the gui")
         self.pulse=[]
-        self.pulse=datasets.get('count_y')
+#        self.pulse=datasets.get('count_y')
         try:
             self.pulse=datasets.get('count_y')
         except:
@@ -85,9 +85,9 @@ class inputtest(EnvExperiment):
     def run(self):
                     i=1
                     roundd=0
+                    count_t=30#单位为us
                    
-                   
-                    while i!=0 and roundd<100:
+                    while i!=0 and roundd<300:
                         self.pulse.append(m.sin(roundd))
 #                        self.x.append(roundd)
 #                        if len(x)!=len(pulse):
@@ -98,6 +98,7 @@ class inputtest(EnvExperiment):
 #                        self.set_dataset("count_x",self.x,broadcast=True, save=False)
                         self.set_dataset("count_y",self.pulse,broadcast=True, save=False)
                         t.sleep(0.005)
+                        self.set_dataset("count_t",count_t,broadcast=True, save=False)
                     
                         
                     

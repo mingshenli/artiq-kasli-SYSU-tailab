@@ -156,10 +156,10 @@ class A(EnvExperiment):
                         self.ex.ttl5on((self.starttime[stp+1])-(self.starttime[stp]))
                     if self.move[stp]=='0':
                         self.ex.ttl5off((self.starttime[stp+1])-(self.starttime[stp]))
-            self.ex.print3("count=self.ttl1.count()")
-            self.ex.print3("self.set_dataset('count',count,broadcast=True, save=False)")
-            self.ex.print3("print('*******************',count,'***************************')")
-            self.ex.print3("print('finish')")  
+#            self.ex.print3("count=self.ttl1.count()")
+#            self.ex.print3("self.set_dataset('count',count,broadcast=True, save=False)")
+#            self.ex.print3("print('*******************',count,'***************************')")
+            self.ex.print3("print('********************finish****************************')")  
             
             self.ex.f.close()  
         

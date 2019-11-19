@@ -26,9 +26,9 @@ class inputtest(EnvExperiment):
         try:
             self.countt=datasets.get('count_y')
         except:
-            pass
+            self.countt=[]
                 
-        self.t=[]
+        self.t=1
         ##################################################################选择是否清除循环周期
 #        try:
 #            self.set_dataset("count_y",[],broadcast=True, save=False)
@@ -59,10 +59,15 @@ class inputtest(EnvExperiment):
         self.ttl16.output()
 #        self.record()
 #        pulses_handle = self.core_dma.get_handle("pulses")
-        self.core.break_realtime()
+#        self.core.break_realtime()
         f=0
         i=1
         countt=-1
+        
+        readtime=30
+        delaytime=970
+        self.t=readtime+delaytime
+        self.set_dataset("count_t",self.t,broadcast=True, save=False)
         with parallel:
 #            self.core_dma.playback_handle(pulses_handle)
 #            for q in range(2):##################################平行在16口输出脉冲
@@ -70,15 +75,15 @@ class inputtest(EnvExperiment):
 #                delay(2*ms)
 ##            self.ttl16.pulse(10*ns) 
             
-            while(i<100):#控制循环周期，很大时相当于一直开
+            while(i<1000):#控制循环周期，很大时相当于一直开
                 try:
                     
-#                    self.core.reset()
-                    self.core.break_realtime()
-                    delay(500*ms)#################################################################延时
-                    self.ttl1.gate_rising(30*ms)#################################################读脉冲窗口时间
+                    self.core.reset()
+#                    self.core.break_realtime()
+                    delay(delaytime*us)#################################################################延时
+                    self.ttl1.gate_rising(readtime*us)#################################################读脉冲窗口时间
                     countt=((self.ttl1.count()))
-                    print("****************************",countt,"*********************************")
+#                    print("****************************",countt,"*********************************")
                     i=i+1
                     self.setdata(countt,i)
                     
@@ -92,17 +97,17 @@ class inputtest(EnvExperiment):
                     f+=1
                     self.setdata(-1,i)
                     
-#                    print("**********************flow********************************")
+                    print("**********************flow********************************")
         print('fail/total=',f,'/',i)
         print("*************************end*************************")
    
     def setdata(self,count,t):
 #        print('________________________')
         self.countt.append(count)
-        self.t.append(t)
+        
         
         self.set_dataset("count_y",self.countt,broadcast=True, save=False)
-        self.set_dataset("count_x",self.t,broadcast=True, save=False)
+        
 
 
 
