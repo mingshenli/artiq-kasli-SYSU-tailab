@@ -1,24 +1,24 @@
-#前言
+# 前言
 本文主要讲述操作、修改本控制系统所需要的必要知识，全面了解artiq系统的知识参见官网说明书。同样本文对于python和pyqt的讲解仅限于控制系统使用到和涉及到的，以后有可能会撰写python和pyqt学习笔记，但还是建议对其进行系统性地学习。
-###需要掌握的知识
-#####基本python知识
+### 需要掌握的知识
+##### 基本python知识
 随便找本书吧……
 以下知识是重点要用的
 [类的用法]<https://blog.csdn.net/swinfans/article/details/89393853>
 [类的用法]<https://www.jianshu.com/p/d34a3e435477>
 [list操作]<https://www.cnblogs.com/Yanjy-OnlyOne/p/9808130.html>
 getattr后面会讲
-#####PyQt5图形界面编写
-#####artiq系统
+##### PyQt5图形界面编写
+##### artiq系统
 [官网]<http://m-labs.hk/experiment-control/resources/>
 [官方说明书]<https://m-labs.hk/artiq/manual/>
 
-#artiq初步
-###硬件构成
+# artiq初步
+### 硬件构成
 我们采用的artiq-kasli模块主要使用的是40路ttl输入/输出端口，其在artiq-python接口中的编号为ttl0-39,其中ttl0-15仅用于输入。而ttl16-39仅用于输出。
-###控制逻辑
+### 控制逻辑
 artiq硬件为FPGA可编程门阵列，其厂家提供了一套python-硬件接口，其本质上可以理解为一个python代码编译器，对于普通的python代码采用一般的python编译器进行处理，而对于经过特殊标记（详见下文）的硬件执行代码采用其厂家独有的编译过程将python风格的代码转换成硬件能够理解的任务并执行任务。这使得我们不必采用复杂而扩展困难的FPGA专用的编程语言，而可以直接使用python编程语言对代码进行控制。
-###基础代码
+### 基础代码
 以下将通过一个最简单的artiq代码来展示其工作过程和工作原理，代码功能是使得一个ttl端口输出脉冲
 ```
 from artiq.experiment import *  #导入相关包
@@ -44,8 +44,8 @@ from artiq.experiment import *  #导入相关包
 ```
 **需要注意的是直接执行的代码同级目录、artiq_master同级目录等地方（最好是所有涉及的目录），都需要一个名为`device_db.py`的文件来说明硬件构成和硬件名称，一般而言其都是相同的不需要修改。**
 更多进阶和高级用法将在以下讲述artiq系统架构时提及。
-#系统架构
-###artiq系统架构
+# 系统架构
+### artiq系统架构
 - 系统环境
   artiq系统采用python环境，每次运行调用artiq包的代码时必须启动artiq环境，而一般不能在编译器中直接运行。方法为在cmd中输入`activate artiq-kasli`,（或是activate安装artiq环境时的命名）.
 - 执行单个任务文件
@@ -100,7 +100,7 @@ from artiq.experiment import *  #导入相关包
     
   
     
-###控制系统架构
+### 控制系统架构
 artiq系统实际上只是整个系统中时序控制部分所用的，与其说是使用了artiq系统，从python的角度来讲，更合适的表述是调用了一系列artiq环境提供的python包来实现硬件控制。
 整个控制系统的架构可以表述为：
 - 硬件架构
