@@ -75,7 +75,7 @@ class inputtest(EnvExperiment):
 #                delay(2*ms)
 ##            self.ttl16.pulse(10*ns) 
             
-            while(i<1000):#控制循环周期，很大时相当于一直开
+            while(i<10):#控制循环周期，很大时相当于一直开
                 try:
                     
                     self.core.reset()
@@ -83,7 +83,7 @@ class inputtest(EnvExperiment):
                     delay(delaytime*us)#################################################################延时
                     self.ttl1.gate_rising(readtime*us)#################################################读脉冲窗口时间
                     countt=((self.ttl1.count()))
-#                    print("****************************",countt,"*********************************")
+                    print("****************************",countt,"*********************************")
                     i=i+1
                     self.setdata(countt,i)
                     

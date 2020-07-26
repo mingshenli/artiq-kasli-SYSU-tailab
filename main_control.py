@@ -161,6 +161,9 @@ class mainprogram(Main_control_window):
                     check=getattr(getattr(self,pa_lib[pa][0]+'_mainwindow'),'get_pa_state')(pa_lib[pa][1])
                     if check==2:
                         print('state: ',check)
+                        #前面将硬件的subwindow按照硬件_mainwindow格式导入，subwindow能够独立执行，也能提供函数给此处的扫描
+                        #（hardwarelib也能提供，下文实际采用的也是如此）
+                        #其中必有一个get_pa_state函数
                         re=getattr(getattr(self.scan,pa_lib[pa][0]),pa_lib[pa][1])(pa_lib[pa][2]+(cycle)*pa_lib[pa][3])
                         print('    ',re)
                         self.log.append('    '+str(re))

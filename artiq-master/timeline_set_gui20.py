@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QFileDialog,QMessageBox
 from PyQt5.QtCore import pyqtSignal
 import time as t
 import os
-import sys,copy,re
+import sys,copy,re,math
 import numpy as np
 from artiq.protocols.pc_rpc import (Client)
 import pyqtgraph as pg
@@ -79,18 +79,22 @@ class timeline_vi(timeline_vi_window):
         
         #print('call')
         #print('chan',max_chan)
-        x=np.linspace(0,max_t+1,max_t+1)
-        y=np.linspace(0,0,max_t+1)
-        ######################################################设置方波数组
-        for i in range(1,max_chan+1):
-            setattr(self,'y'+str(i),np.linspace(i,i,max_t+1))
-       
-        for i in range(len(timeline)):
-            index_chan=int(timeline[i][0])
-            index_start=int(timeline[i][1]*self.unitchange(timeline[i][2]))
-            index_stop=int(timeline[i][3]*self.unitchange(timeline[i][4]))
-            getattr(self,'y'+str(index_chan))[index_start:index_stop]=index_chan+0.9
-#       ######################################################设置方波数组    
+        pointnumber=1000
+        x=np.linspace(0,max_t+1,pointnumber)
+        y=np.linspace(0,0,pointnumber)
+        try:
+            ######################################################设置方波数组
+            for i in range(1,max_chan+1):
+                setattr(self,'y'+str(i),np.linspace(i,i,pointnumber))
+            
+            for i in range(len(timeline)):
+                index_chan=int(timeline[i][0])
+                index_start=int(timeline[i][1]*self.unitchange(timeline[i][2])/max_t*pointnumber)
+                index_stop=int(timeline[i][3]*self.unitchange(timeline[i][4])/max_t*pointnumber)
+                getattr(self,'y'+str(index_chan))[index_start:index_stop]=index_chan+0.9
+    #       ######################################################设置方波数组
+        except:
+            pass
         for i in range(1,max(self.max_max_chan,max_chan)+1):
             try:
                  getattr(self,'p'+str(i)).clear()

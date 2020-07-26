@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\18926\Desktop\qtsesigner\timeline_set_gui30_window.ui'
+# Form implementation generated from reading ui file 'D:\program\qtsesigner\timeline_set_gui30_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.6
 #
@@ -44,12 +44,14 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.comboBox_starttime, 1, 2, 1, 1)
         self.pinbox_stoptime = QtWidgets.QDoubleSpinBox(self.centralwidget)
         self.pinbox_stoptime.setMinimumSize(QtCore.QSize(0, 70))
-        self.pinbox_stoptime.setMaximum(1001.0)
+        self.pinbox_stoptime.setDecimals(5)
+        self.pinbox_stoptime.setMaximum(9999.0)
         self.pinbox_stoptime.setObjectName("pinbox_stoptime")
         self.gridLayout.addWidget(self.pinbox_stoptime, 2, 1, 1, 1)
         self.pinbox_begintime = QtWidgets.QDoubleSpinBox(self.centralwidget)
         self.pinbox_begintime.setMinimumSize(QtCore.QSize(0, 70))
-        self.pinbox_begintime.setMaximum(1001.0)
+        self.pinbox_begintime.setDecimals(4)
+        self.pinbox_begintime.setMaximum(9999.0)
         self.pinbox_begintime.setObjectName("pinbox_begintime")
         self.gridLayout.addWidget(self.pinbox_begintime, 1, 1, 1, 1)
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
@@ -63,7 +65,8 @@ class Ui_MainWindow(object):
         self.pinbox_choose = QtWidgets.QSpinBox(self.centralwidget)
         self.pinbox_choose.setMinimumSize(QtCore.QSize(0, 70))
         self.pinbox_choose.setSuffix("")
-        self.pinbox_choose.setMaximum(10)
+        self.pinbox_choose.setMinimum(1)
+        self.pinbox_choose.setMaximum(20)
         self.pinbox_choose.setObjectName("pinbox_choose")
         self.gridLayout.addWidget(self.pinbox_choose, 0, 1, 1, 1)
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -86,6 +89,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.add_sel, 0, 1, 2, 1)
         self.add_posi = QtWidgets.QSpinBox(self.centralwidget)
         self.add_posi.setMinimumSize(QtCore.QSize(0, 70))
+        self.add_posi.setMaximum(100)
         self.add_posi.setObjectName("add_posi")
         self.gridLayout_2.addWidget(self.add_posi, 0, 2, 2, 1)
         self.pushButton_delete = QtWidgets.QPushButton(self.centralwidget)
