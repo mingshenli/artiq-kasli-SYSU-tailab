@@ -50,10 +50,10 @@
   <img src="picture/main_control_gui.png" width = "500" height = "500" alt="图片名称" align=center />
   </div>
 
-  <div  align="center">    
+  <!-- <div  align="center">    
   <img src="https://github.com/mingshenli/artiq-kasli-SYSU-tailab/picture/main_control_gui.png" width = "500" height = "500" alt="图片名称" align=center />
   </div>
-  ![image]("https://github.com/mingshenli/artiq-kasli-SYSU-tailab/picture/main_control_gui.png")
+  ![image]("https://github.com/mingshenli/artiq-kasli-SYSU-tailab/picture/main_control_gui.png") -->
 
   ### basic propertise
   
