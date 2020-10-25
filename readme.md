@@ -50,6 +50,11 @@
   <img src="picture/main_control_gui.png" width = "500" height = "500" alt="图片名称" align=center />
   </div>
 
+  <div  align="center">    
+  <img src="https://github.com/mingshenli/artiq-kasli-SYSU-tailab/picture/main_control_gui.png" width = "500" height = "500" alt="图片名称" align=center />
+  </div>
+  ![image]("https://github.com/mingshenli/artiq-kasli-SYSU-tailab/picture/main_control_gui.png")
+
   ### basic propertise
   
   This interface is the main pannel of our control system. The most important function of this pannel is to plan the low-time-resolution hardwares' timeline. One can specify any output value of any equipment with a parameter scan mode(linear, random etc.). Different equipments can scan the output value simultaneously. This function is designed to change the harewares' output before a corresponding laser sequence.  After every move of the hareware scan the laser sequency will execute for a given loop times(1 for now), after which the hardware scan will move to next values. The laser sequence will not change, for now.
