@@ -2,7 +2,7 @@
 
 # This document is not complete and is still being updated
 # preface
-  This doc intends to offer an introduction and a technical specifiction to the control system. Although the target readers are basiclly members of our lab, I firmly brlieve that one can always find something interesting here.
+  This doc intends to offer an introduction and a technical specifiction to the control system. Although the target readers are basiclly members of our lab, I firmly believe that one can always find something interesting here.
 
   I started this project at the begining of 2018, months after I entered SYSU as an undergraduate. Thanks to my experience with Pascal and Arduino in high school, I got the opportunity to work for the Trap Ion Lab in school of physics and astronmy, assigned to write the control system. 
 
