@@ -1,6 +1,10 @@
 
 
 ### This document is not complete and is still being updated
+
+Update 2-27, 2023: I found this manual is far from complete. If one is really interested in it, please contact me. I will offer my bachelor's thesis part of which is the guide on how to use this system (Here only
+part of its functions are introduced). Also directly
+contact me if you want to discuss some technical details.
 # preface
 
   This control system is designed for LabIon, Quantum Information-Measurement-Control Group, school of physics and astronomy, Sun Yat-Sun university. Our lab is under prof. Le Luo's lead. 
